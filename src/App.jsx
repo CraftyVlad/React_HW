@@ -1,85 +1,59 @@
-import React, { useState, useEffect } from 'react';
+import React, { useReducer } from 'react';
 
-// Реалізуйте додаток «Орел або Решка». Користувач загадує орла або решку. Додаток випадково вибирає орла або решку. Якщо вибір користувача співпадає з результатом — він виграв, інакше програв. Використовуйте сайт API random.org.
+// 1. Створіть форму з двома полями введення: одне для введення імені користувача, інше для введення його електронної пошти. Вико­ристо­вуйте use­Reducer() для збереження цих даних і відображення їх на сторінці.
 
-const CoinFlip = () => {
-  const [userChoice, setUserChoice] = useState('');
-  const [flipResult, setFlipResult] = useState('');
-  const [message, setMessage] = useState('');
-  const [loading, setLoading] = useState(false);
-
-  const handleUserChoice = (choice) => {
-    setUserChoice(choice);
-    setFlipResult('');
-    setMessage('');
-  };
-
-  useEffect(() => {
-    if (userChoice) {
-      const fetchFlipResult = async () => {
-        setLoading(true);
-        try {
-          const response = await fetch('https://api.random.org/json-rpc/2/invoke', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              jsonrpc: "2.0",
-              method: "generateIntegers",
-              params: {
-                apiKey: "i hid mine, so insert yours",
-                n: 1,
-                min: 0,
-                max: 1,
-              },
-              id: 42,
-            }),
-          });
-
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-          }
-
-          const data = await response.json();
-
-          if (data.result && data.result.random && data.result.random.data) {
-            const randomNumber = data.result.random.data[0];
-            const result = randomNumber === 0 ? 'Heads' : 'Tails';
-            setFlipResult(result);
-            setMessage(result === userChoice ? 'You won!' : 'You lost!');
-          } else {
-            throw new Error('Unexpected response format');
-          }
-        } catch (error) {
-          setMessage('Didnt get result.');
-          console.error('Error:', error);
-        } finally {
-          setLoading(false);
-        }
-      };
-
-      fetchFlipResult();
-    }
-  }, [userChoice]);
-
-  return (
-    <div style={{ textAlign: 'center', padding: '20px' }}>
-      <h1>Heads or tails (CoinFlip)</h1>
-      <p>Pick heads or tails</p>
-      <div>
-        <button onClick={() => handleUserChoice('Heads')}>Heads</button>
-        <button onClick={() => handleUserChoice('Tails')}>Tails</button>
-      </div>
-      {loading && <p>Flipping coin...</p>}
-      {flipResult && (
-        <div>
-          <p>Result: {flipResult}</p>
-          <p>{message}</p>
-        </div>
-      )}
-    </div>
-  );
+const initialState = {
+  username: '',
+  email: '',
 };
 
-export default CoinFlip;
+function formReducer(state, action) {
+  switch (action.type) {
+    case 'set_username':
+      return { ...state, username: action.payload };
+    case 'set_email':
+      return { ...state, email: action.payload };
+    default:
+      return state;
+  }
+}
+
+export default function UserForm() {
+  const [state, dispatch] = useReducer(formReducer, initialState);
+
+  const handleUsernameChange = (e) => {
+    dispatch({ type: 'set_username', payload: e.target.value });
+  };
+
+  const handleEmailChange = (e) => {
+    dispatch({ type: 'set_email', payload: e.target.value });
+  };
+
+  return (
+    <div>
+      <form>
+        <div>
+          <label>Name:</label>
+          <input
+            type="text"
+            value={state.username}
+            onChange={handleUsernameChange}
+          />
+        </div>
+        <div>
+          <label>Email:</label>
+          <input
+            type="email"
+            value={state.email}
+            onChange={handleEmailChange}
+          />
+        </div>
+      </form>
+      <div>
+        <h2>Entered data:</h2>
+        <p><strong>Name:</strong> {state.username}</p>
+        <p><strong>Email:</strong> {state.email}</p>
+      </div>
+    </div>
+  );
+}

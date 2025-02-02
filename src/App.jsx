@@ -1,48 +1,67 @@
-import React, { createContext, useState, useContext } from 'react';
-import Button from "./components/Button"
+import React, { useReducer, useContext, createContext } from "react";
 import "./App.css"
 
-// 2. Створіть додаток, який дозволяє перемикати тему (світлу або темну) для всього інтерфейсу.
-// - Створіть ThemeContext для зберігання теми та функції перемикання.
-// - Використовуйте useContext у компонентах для зміни класів на основі вибраної теми.
-// - Додайте кнопку для перемикання теми.
+// Завдання: Світлофор
 
-const ThemeContext = createContext();
+const TrafficLightContext = createContext();
 
-const ThemeProvider = ({ children }) => {
-  const [theme, setTheme] = useState('light');
+const initState = { color: "grey" };
 
-  const toggleTheme = () => {
-    setTheme((prev) => (prev === 'light' ? 'dark' : 'light'));
-  };
+const trafficLightReducer = (state, action) => {
+  switch (action.type) {
+    case "GREEN":
+      return { color: "green" };
+    case "YELLOW":
+      return { color: "yellow" };
+    case "RED":
+      return { color: "red" };
+    default:
+      return state;
+  }
+};
 
+const TrafficLightProvider = ({ children }) => {
+  const [state, dispatch] = useReducer(trafficLightReducer, initState);
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme }}>
-      <div className={`app-container ${theme}`}>
-        {children}
-      </div>
-    </ThemeContext.Provider>
+    <TrafficLightContext.Provider value={{ state, dispatch }}>
+      {children}
+    </TrafficLightContext.Provider>
   );
 };
 
-const ThemeToggleButton = () => {
-  const { toggleTheme } = useContext(ThemeContext);
-
+const TrafficLight = () => {
+  const { state } = useContext(TrafficLightContext);
   return (
-    <Button onClick={toggleTheme}>
-      Toggle Theme
-    </Button>
+    <div className="traffic-light">
+      {["red", "yellow", "green"].map((color) => (
+        <div
+          key={color}
+          className={`light ${state.color === color ? color : ""}`}
+        ></div>
+      ))}
+    </div>
+  );
+};
+
+const Controls = () => {
+  const { dispatch } = useContext(TrafficLightContext);
+  return (
+    <div className="controls">
+      <button onClick={() => dispatch({ type: "RED" })}>Turn red</button>
+      <button onClick={() => dispatch({ type: "YELLOW" })}>Turn yellow</button>
+      <button onClick={() => dispatch({ type: "GREEN" })}>Turn green</button>
+    </div>
   );
 };
 
 const App = () => {
   return (
-    <ThemeProvider>
-      <div>
-        <p>Click button below to toggle the theme:</p>
-        <ThemeToggleButton />
+    <TrafficLightProvider>
+      <div className="container">
+        <TrafficLight />
+        <Controls />
       </div>
-    </ThemeProvider>
+    </TrafficLightProvider>
   );
 };
 

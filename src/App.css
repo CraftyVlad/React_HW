@@ -1,19 +1,58 @@
-.app-container {
-  min-height: 100vh;
-  min-width: 100vw;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  transition: all 0.3s ease;
-  text-align: center;
+.container {
+	text-align: center;
+	margin-top: 50px;
 }
 
-.app-container.light {
-  background-color: white;
-  color: black;
+.traffic-light {
+	width: 100px;
+	height: 180px;
+	background-color: black;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: space-around;
+	padding: 10px;
+	border-radius: 10px;
+	margin: 0 auto;
 }
 
-.app-container.dark {
-  background-color: #333;
-  color: white;
+.light {
+	width: 50px;
+	height: 50px;
+	border-radius: 50%;
+	background-color: grey;
+}
+
+.red {
+	background-color: red;
+}
+
+.yellow {
+	background-color: yellow;
+}
+
+.green {
+	background-color: green;
+}
+
+.controls {
+	margin-top: 20px;
+}
+
+
+
+button:hover {
+	opacity: 0.8;
+}
+
+button:nth-child(1) {
+	color: red;
+}
+
+button:nth-child(2) {
+	color: yellow;
+}
+
+button:nth-child(3) {
+	color: green;
 }
